@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>edit page</title>
+    <link href="edit-note.css" rel="stylesheet">
+    <link href="universal.css" rel="stylesheet">
+  </head>
+  <body>
+
+  <div id="container">
+  <h2>Edit page</h2>
+    <div id="note-header">
+      <textarea rows="1" cols="30" id="edit-title"></textarea>
+    <button id="confirm">> confirm</button>
+    </div>
+    <hr />
+    <textarea rows="4" cols="30" id="edit-content"></textarea>
+  </div>
+  </body>
+  <script>
+    function autoResize(textarea) {
+      textarea.style.height = "auto";
+      textarea.style.height = textarea.scrollHeight + "px";
+    }
+
+    const titleArea = document.getElementById('edit-title');
+    const contentArea = document.getElementById('edit-content');
+
+    [titleArea, contentArea].forEach(textarea => {
+      textarea.addEventListener('input', () => autoResize(textarea));
+      autoResize(textarea);
+    });
+
+    const apiURL = "http://localhost:3000/api/notes/";
+
+    function getIdFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('id');
+    }
+
+    const id = getIdFromURL();
+
+    async function loadData() {
+      const res = await fetch(`${apiURL}${id}`);
+      const note = await res.json();
+
+      titleArea.value = note.title;
+      contentArea.value = note.content;
+    }
+
+    document.getElementById('confirm').addEventListener('click', async () => {
+      const title = document.getElementById('edit-title').value;
+      const content = document.getElementById('edit-content').value
+
+      await fetch(`${apiURL}${id}`, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({title, content})
+      });
+
+      window.location.href = "index.html"
+    });
+
+    loadData();
+
+  </script>
+
+
+</html>

@@ -1,0 +1,47 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notes-app</title>
+  <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="universal.css">
+</head>
+<body>
+  <h1>Home</h1>
+  <a href="notes.html">add notes</a>
+  <h3>Notes:</h3> <hr />
+  <div id="notes-menu">
+  </div>
+</body>
+
+<script>
+  const apiurl = "http://localhost:3000/api/notes/"
+
+  const noteMenu = document.getElementById('notes-menu');
+
+  noteMenu.addEventListener('click', (event) => {
+    const clicked = event.target.closest('.note-list-elements');
+    if (clicked) {
+      const noteId = clicked.getAttribute('id');
+      window.location.href = `single-note.html?id=${noteId}`;
+    }
+  });
+
+  async function loadNoteslist() {
+    const res = await fetch(apiurl);
+    const notes = await res.json();
+
+    notes.forEach(note => {
+      const n = document.createElement("div");
+      n.className = "note-list-elements";
+      n.setAttribute('id', `${note.id}`);
+      n.innerHTML = `
+        <p>> ${note.title}</p>
+      `
+      noteMenu.appendChild(n);
+    })
+  }
+
+  loadNoteslist();
+</script>
+</html>

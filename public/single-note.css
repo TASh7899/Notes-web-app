@@ -1,0 +1,37 @@
+#note-container {
+  padding: 20px;
+}
+
+#note-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: auto;
+}
+
+#menu {
+  display: inline-flex;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  vertical-align: middle;
+  margin-left: 0;
+  gap: 20px;
+}
+
+#noteTitle {
+  display: inline-block;
+  margin: 0;
+}
+
+#edit:hover, #delete:hover{
+  color: gray;
+  cursor: pointer;
+}
+
+menu li {
+  display: inline;
+  margin-right: 10px;
+}
+
+

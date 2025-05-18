@@ -1,0 +1,10 @@
+.note-list-elements {
+  box-sizing: border-box;
+  margin: 5px;
+  cursor: pointer;
+}
+
+.note-list-elements:hover {
+  border-color: gray;
+  color: gray;
+}
