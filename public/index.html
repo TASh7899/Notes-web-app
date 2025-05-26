@@ -9,12 +9,29 @@
 <body>
   <h1>Home</h1>
   <a href="notes.html">add notes</a>
+  <button id="logout">logout</button>
   <h3>Notes:</h3> <hr />
   <div id="notes-menu">
   </div>
 </body>
 
 <script>
+  
+  fetch('http://localhost:3000/api/user/check-session', {
+    credentials: 'include'
+  })
+    .then(res => {
+      if(!res.ok) throw new Error("Not Logged In");
+      return res.json();
+    })
+    .then(data => {
+      console.log("Logged in as ", data.username);
+      loadNoteslist();
+    })
+    .catch(() => {
+      window.location.href = "login.html";
+    });
+
   const apiurl = "http://localhost:3000/api/notes/"
 
   const noteMenu = document.getElementById('notes-menu');
@@ -28,20 +45,44 @@
   });
 
   async function loadNoteslist() {
-    const res = await fetch(apiurl);
+    const res = await fetch(apiurl, { credentials: 'include'});
     const notes = await res.json();
+
+    if (!Array.isArray(notes)) {
+      alert(notes.message);
+      return;
+    }
 
     notes.forEach(note => {
       const n = document.createElement("div");
       n.className = "note-list-elements";
-      n.setAttribute('id', `${note.id}`);
+      n.setAttribute('id', `${note._id}`);
       n.innerHTML = `
         <p>> ${note.title}</p>
-      `
+        `
       noteMenu.appendChild(n);
     })
   }
 
-  loadNoteslist();
+  document.getElementById('logout').addEventListener('click',async () => {
+    await fetch('http://localhost:3000/api/user/logout', {
+      method: 'GET',
+      credentials: 'include'
+    })
+    .then(res => {
+      if (res.ok) return res.json();
+      throw new Error("Logout failed");
+    })
+    .then(data => {
+      alert(data.message);
+      window.location.href = "login.html";
+    })
+    .catch((err) => {
+      alert(err.message);
+    });
+
+  })
+
+
 </script>
 </html>

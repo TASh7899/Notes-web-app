@@ -15,8 +15,7 @@
 <script>
   function getNoteIdFromUrl() {
     const params = new URLSearchParams(window.location.search);
-    return params.get('id');
-  }
+    return params.get('id'); }
 
   const apiURL = 'http://localhost:3000/api/notes/';
   const id = getNoteIdFromUrl();

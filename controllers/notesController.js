@@ -1,46 +1,60 @@
-let notes = [{id: 0, title: "my note", content: "this is the first note"}];
-let idcounter = 1;
+const Note = require('../models/note.js');
 
-exports.getAllNotes = (req, res) => {
-  res.json(notes);
+exports.getAllNotes = async (req, res) => {
+  try {
+    const notes = await Note.find({user: req.session.userId});
+    res.json(notes);
+  } catch(err) {
+    res.status(500).json({ message: "Server error"});
+  }
 };
 
-exports.getNotesById = (req, res) => {
-  const note = notes.find(n => n.id === parseInt(req.params.id));
-  if (!note) return res.status(400).json({ message: 'Note not found'});
-  res.json(note);
+exports.getNoteById = async (req, res) => {
+  try {
+    const note = await Note.findOne({_id: req.params.id, user: req.session.userId});
+    if (!note) return res.status(404).json({ message: "note not found"});
+    res.json(note);
+  } catch(err) {
+    res.status(400).json({message: "invalid id"});
+  }
 };
 
-exports.createNote = (req, res) => {
+exports.createNote = async (req, res) => {
   const {title, content} = req.body;
-  if (!title || !content) return res.status(400).json({message: "provide title and content"});
+  if (!title || !content) {
+    return res.status(400).json({ message: "title or content not found"});
+  }
 
-  const newNote = {
-    id: idcounter++,
-    title,
-    content
-  };
-  notes.push(newNote);
-  res.status(201).json(newNote);
+  try{
+    const note = new Note({title, content, user: req.session.userId});
+    await note.save();
+    res.status(201).json(note);
+  } catch (err) {
+    res.status(500).json({message: "could not create note"});
+  }
 };
 
-exports.updateNote = (req, res) => {
-  const {title, content} = req.body;
-  if (!title || !content) return res.status(404).json({ message: 'provide title and content'});
-  const note = notes.find(n => n.id === parseInt(req.params.id));
-  if (!note) return res.status(404).json({ message: "Note not found"});
+exports.updateNote = async (req, res) => {
+  const { title, content } = req.body;
+  if (!title || !content) {
+    return res.status(400).json({ message: "title or content not found"});
+  }
 
-  note.title = title;
-  note.content = content;
-
-  res.json(note);
+  try {
+    const note = await Note.findOneAndUpdate({_id: req.params.id, user: req.session.userId}, {title, content}, {new: true, runValidators: true});
+    if (!note) return res.status(404).json({message: "note not found"});
+    res.json(note);
+  } catch(err) {
+    res.status(400).json({message: "Invalid ID or Update Error"});
+  }
 };
 
-exports.deleteNote = (req, res) => {
-  const delIndex = notes.findIndex(n => n.id === parseInt(req.params.id));
-  if (delIndex === -1) return res.status(404).json({ message: "Note not found"});
-
-  notes.splice(delIndex, 1);
-  res.json({message: "note deleted sucessfully"});
+exports.deleteNote = async (req, res) => {
+  try {
+    const note = await Note.findOneAndDelete({_id: req.params.id, user: req.session.userId});
+    if (!note) return res.status(404).json({message: "note not found"})
+    res.json({message: "note deleted Successfully"});
+  } catch(err) {
+    res.status(400).json({message: "Invalid id"});
+  }
 };
-
