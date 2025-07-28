@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const cors = require('cors');
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const notesRoutes = require('./routes/notes.js');
@@ -8,14 +9,18 @@ const path = require('path')
 require("dotenv").config();
 const mongoose = require('mongoose');
 
+app.use(cors({
+  origin: 'https://localhost:51673',
+  credentials: true
+}));
+
 app.use(express.json());
-app.use(express.static('public'));
 
 app.use(session({
   secret: process.env.SECRET,
   resave: false,
   saveUninitialized: true,
-  store: MongoStore.create({mongoUrl: 'mongodb://localhost:27017/Notes'}),
+  store: MongoStore.create({mongoUrl: 'mongodb://localhost:27017/auth'}),
   cookie: {maxAge: 1000* 60* 60}
 }));
 
