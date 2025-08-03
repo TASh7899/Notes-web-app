@@ -9,5 +9,6 @@ router.post('/',requireLogin ,notesController.createNote);
 router.get('/:id',requireLogin, notesController.getNoteById);
 router.put('/:id',requireLogin, notesController.updateNote);
 router.delete('/:id',requireLogin, notesController.deleteNote);
+router.put('/move/:id', requireLogin, notesController.moveNote);
 
 module.exports = router;

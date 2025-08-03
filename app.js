@@ -5,12 +5,13 @@ const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const notesRoutes = require('./routes/notes.js');
 const authRoutes = require('./routes/userRoutes.js');
+const folderRoutes = require('./routes/folder.js');
 const path = require('path')
 require("dotenv").config();
 const mongoose = require('mongoose');
 
 app.use(cors({
-  origin: 'https://localhost:51673',
+  origin: 'http://localhost:5173',
   credentials: true
 }));
 
@@ -26,6 +27,11 @@ app.use(session({
 
 app.use('/api/notes', notesRoutes);
 app.use('/api/user', authRoutes);
+app.use('/api/folders', folderRoutes);
+
+app.get('/test', (req, res) => {
+  return res.json({message : "server says hello"});
+})
 
 mongoose.connect('mongodb://localhost:27017/Notes')
   .then(() => console.log('connected to mongodb'))
