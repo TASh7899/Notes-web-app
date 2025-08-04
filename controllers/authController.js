@@ -30,7 +30,7 @@ exports.login = async (req, res) => {
     const valid = await user.isValidPassword(password);
     if (valid) {
       req.session.userId = user._id;
-      res.json({message: "login successful"});
+      res.json({message: "login successful", username: username});
       console.log("logged in");
     } else {
       return res.status(401).json({error: "Invalid Password"});
