@@ -61,7 +61,7 @@ exports.isLoggedIn = async (req, res) => {
       return res.status(401).json({ error: "you are not authorized", loggedIn: false });
     }
 
-    return res.status(200).json({ message: "authorized", loggedIn: true });
+    return res.status(200).json({ message: "authorized", loggedIn: true, username : user.username });
 
   } catch (err) {
       console.log(err);
