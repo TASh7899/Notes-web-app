@@ -21,7 +21,7 @@ app.use(session({
   secret: process.env.SECRET,
   resave: false,
   saveUninitialized: true,
-  store: MongoStore.create({mongoUrl: 'mongodb://localhost:27017/auth'}),
+  store: MongoStore.create({mongoUrl: process.env.MONGOURL}),
   cookie: {maxAge: 1000* 60* 60}
 }));
 
@@ -37,9 +37,8 @@ mongoose.connect('mongodb://localhost:27017/Notes')
   .then(() => console.log('connected to mongodb'))
   .catch((err) => console.error(`caught error: ${err.message}`));
 
-const port = 3000;
-app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
+app.listen(process.env.PORT, () => {
+  console.log(`Server started`);
 });
 
 
