@@ -21,7 +21,7 @@ app.use(session({
   secret: process.env.SECRET,
   resave: false,
   saveUninitialized: true,
-  store: MongoStore.create({mongoUrl: process.env.MONGOURL}),
+  store: MongoStore.create({mongoUrl: `${process.env.MONGOURL}/auth`}),
   cookie: {maxAge: 1000* 60* 60}
 }));
 
@@ -33,7 +33,7 @@ app.get('/test', (req, res) => {
   return res.json({message : "server says hello"});
 })
 
-mongoose.connect('mongodb://localhost:27017/Notes')
+mongoose.connect(`${process.env.MONGOURL}/Notes`)
   .then(() => console.log('connected to mongodb'))
   .catch((err) => console.error(`caught error: ${err.message}`));
 
