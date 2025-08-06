@@ -10,10 +10,16 @@ const path = require('path')
 require("dotenv").config();
 const mongoose = require('mongoose');
 
+
+const allowedOrigins = [
+  "https://notes-app-frontend-ox2u.vercel.app",
+  "https://notes-app-frontend-ox2u-git-main-tash7899s-projects.vercel.app",
+  "https://notes-app-frontend-ox2u-hm1ixvlob-tash7899s-projects.vercel.app",
+  "http://localhost:3000"
+];
+
 app.use(cors({
-  origin: ["notes-app-frontend-ox2u.vercel.app",
-"notes-app-frontend-ox2u-git-main-tash7899s-projects.vercel.app",
-"notes-app-frontend-ox2u-hm1ixvlob-tash7899s-projects.vercel.app"],
+  origin: allowedOrigins,
   credentials: true
 }));
 
