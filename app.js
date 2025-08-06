@@ -11,9 +11,7 @@ require("dotenv").config();
 const mongoose = require('mongoose');
 
 app.use(cors({
-  origin: [  'https://notes-app-frontend-ox2u.vercel.app',
-  'https://notes-app-frontend-ox2u-git-main-tash7899s-projects.vercel.app',
-  'http://localhost:3000'],
+  origin: '*',
   credentials: true
 }));
 
