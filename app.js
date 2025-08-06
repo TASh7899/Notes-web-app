@@ -14,6 +14,7 @@ app.use(cors({
   origin: ['https://notes-app-frontend-ox2u.vercel.app', 'http://localhost:5173'],
   credentials: true
 }));
+app.options('*', cors());
 
 app.use(express.json());
 
@@ -22,7 +23,7 @@ app.use(session({
   resave: false,
   saveUninitialized: true,
   store: MongoStore.create({mongoUrl: `${process.env.MONGOURL}/auth`}),
-  cookie: {maxAge: 1000* 60* 60}
+  cookie: {maxAge: 1000* 60* 60, httpOnly: true, secure: true, sameSite: 'none'}
 }));
 
 app.use('/api/notes', notesRoutes);
