@@ -10,16 +10,8 @@ const path = require('path')
 require("dotenv").config();
 const mongoose = require('mongoose');
 
-const allowedOrigin = ['https://notes-app-frontend-ox2u.vercel.app', 'http://localhost:5173'];
-
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigin.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('not allowed by cors'));
-    }
-  },
+  origin: ['https://notes-app-frontend-ox2u.vercel.app', 'http://localhost:5173'],
   credentials: true
 }));
 
