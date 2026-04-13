@@ -16,7 +16,7 @@ const allowedOrigins = [
   "https://notes-app-frontend-ox2u.vercel.app",
   "https://notes-app-frontend-ox2u-git-main-tash7899s-projects.vercel.app",
   "https://notes-app-frontend-ox2u-hm1ixvlob-tash7899s-projects.vercel.app",
-  "http://localhost:3000"
+  "http://localhost:5173"
 ];
 
 app.use(cors({
@@ -37,7 +37,7 @@ app.use(session({
   resave: false,
   saveUninitialized: true,
   store: MongoStore.create({mongoUrl: `${process.env.MONGOURL}/auth`}),
-  cookie: {maxAge: 1000* 60* 60, httpOnly: true, secure: true, sameSite: 'none'}
+  cookie: {maxAge: 1000* 60* 60, httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'}
 }));
 
 app.use('/api/notes', notesRoutes);
@@ -53,7 +53,36 @@ mongoose.connect(`${process.env.MONGOURL}/Notes`)
   .catch((err) => console.error(`caught error: ${err.message}`));
 
 app.listen(process.env.PORT, () => {
-  console.log(`Server started`);
+  console.log(`Server started on `, process.env.PORT);
 });
 
+const verifyCronSecret = (req, res, next) => {
+  const cronToken = req.headers['x-cron-secret'];
+  if (cronToken && cronToken === process.env.CRON_SECRET) {
+    next();
+  } else {
+    res.status(401).json({ error: "Unauthorized access" });
+  }
+};
+
+app.get('/api/cron/ping-db', verifyCronSecret, async (req, res) => {
+  try {
+    const state = mongoose.connection.readyState;
+    
+    if (state !== 1) {
+      throw new Error("Database not connected");
+    }
+
+    await mongoose.connection.db.admin().ping();
+
+    res.status(200).json({ 
+      status: "success", 
+      message: "MongoDB is alive",
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error("Cron Ping Failed:", error.message);
+    res.status(500).json({ status: "error", message: error.message });
+  }
+});
 
