@@ -13,20 +13,22 @@ folderSchema.add({ folders: [folderSchema] })
 
 const userSchema = new mongoose.Schema({
   username: {type: String, required: true, unique: true},
-  password: {type: String, required: true},
+  password: {type: String},
   email: {type: String, required: true, unique: true},
+  googleId: {type: String, unique: true, sparse: true},
   folders: [folderSchema],
   notes: [notesSchema]
 });
 
 userSchema.pre('save', async function(next) {
-  if (this.isModified('password')) {
+  if (this.isModified('password') && this.password) {
     this.password = await bcrypt.hash(this.password, 10);
   }
   next();
 });
 
 userSchema.methods.isValidPassword = function (password) {
+  if (!this.password) return false;
   return bcrypt.compare(password, this.password);
 };
 

@@ -1,14 +1,16 @@
+require("dotenv").config();
 const express = require("express");
 const app = express();
 const cors = require('cors');
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
+const path = require('path')
+const mongoose = require('mongoose');
+
+
 const notesRoutes = require('./routes/notes.js');
 const authRoutes = require('./routes/userRoutes.js');
 const folderRoutes = require('./routes/folder.js');
-const path = require('path')
-require("dotenv").config();
-const mongoose = require('mongoose');
 
 app.set('trust proxy', 1);
 
@@ -37,7 +39,7 @@ app.use(session({
   resave: false,
   saveUninitialized: true,
   store: MongoStore.create({mongoUrl: `${process.env.MONGOURL}/auth`}),
-  cookie: {maxAge: 1000* 60* 60, httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'}
+  cookie: {maxAge: 1000 * 60 * 60 * 24 * 30, httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'}
 }));
 
 app.use('/api/notes', notesRoutes);
@@ -65,7 +67,7 @@ const verifyCronSecret = (req, res, next) => {
   }
 };
 
-app.get('/api/cron/ping-db', verifyCronSecret, async (req, res) => {
+app.get('/cron/ping-db', verifyCronSecret, async (req, res) => {
   try {
     const state = mongoose.connection.readyState;
     

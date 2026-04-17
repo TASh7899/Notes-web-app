@@ -1,4 +1,6 @@
 const User = require('../models/User.js');
+const { OAuth2Client } = require('google-auth-library');
+const client = new OAuth2Client(process.env.VITE_GOOGLE_CLIENT_ID);
 
 exports.signup = async (req, res) => {
   const { email, password, username} = req.body;
@@ -68,3 +70,47 @@ exports.isLoggedIn = async (req, res) => {
       return res.status(500).json({ error: "server error" });
   }
 }
+
+
+exports.googleLogin = async (req, res) => {
+  const { token } = req.body;
+  
+  if (!token) {
+    return res.status(400).json({ error: "No token Provided" });
+  }
+
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.VITE_GOOGLE_CLIENT_ID,
+    });
+
+    const { email, name, sub: googleId } = ticket.getPayload();
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      let uniqueUsername = name;
+      let nameExists = await User.findOne({ username: name });
+      if (nameExists) {
+        uniqueUsername = `${name}_${Math.floor(Math.random() * 10000)}`;
+      }
+
+      user = new User({
+        username: uniqueUsername,
+        email: email,
+        googleId: googleId,
+      });
+      await user.save();
+    }
+
+    req.session.userId = user._id;
+    res.status(200).json({ message: "Google login successful", username: user.username });
+  } catch (err) {
+    res.status(401).json({ error: "Invalid Google Token" });
+  };
+}
+
+
+
+

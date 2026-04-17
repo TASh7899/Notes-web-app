@@ -6,5 +6,6 @@ router.post('/login', authController.login);
 router.post('/signup', authController.signup);
 router.get('/logout', authController.logout);
 router.get('/check-session', authController.isLoggedIn);
+router.post('/google-login', authController.googleLogin);
 
 module.exports = router;
